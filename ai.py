@@ -1,4 +1,4 @@
-class Ai:
+class LicensePlateDetector:
     def __init__(self, file_path):
         from roboflow import Roboflow
         rf = Roboflow(api_key="kDPogOFw5AbqDr95ytoZ")
@@ -9,12 +9,11 @@ class Ai:
     def run(self):
         result = self.model.predict(self.file_path, confidence=60, overlap=30).json()
         self.coords = []
-        for i in range(len(result['predictions'])):
-            x1 = result['predictions'][i]['x'] - result['predictions'][i]['width'] // 2
-            y1 = result['predictions'][i]['y'] - result['predictions'][i]['height'] // 2
-            x2 = x1 + result['predictions'][i]['width']
-            y2 = y1 + result['predictions'][i]['height']
-
+        for prediction in result['predictions']:
+            x1 = prediction['x'] - prediction['width'] // 2
+            y1 = prediction['y'] - prediction['height'] // 2
+            x2 = x1 + prediction['width']
+            y2 = y1 + prediction['height']
             self.coords.append([x1, y1, x2, y2])
         print(f'{len(self.coords)} detected')
 
