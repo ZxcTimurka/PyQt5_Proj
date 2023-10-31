@@ -40,7 +40,6 @@ class LicensePlateDetector:
             text = reader.readtext(cropped_image, detail=0)
             text = (max(text, key=len))
             text = re.sub(r"\d+$", "", text)
-            print(text)
             n.main(text)
             texts.append(text)
         n.get_car_numbers()
