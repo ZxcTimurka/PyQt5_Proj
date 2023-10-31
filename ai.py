@@ -28,16 +28,20 @@ class LicensePlateDetector:
         import easyocr
         import cv2
         import re
+        from db import CarNumber
 
         img = cv2.imread(self.file_path)
         reader = easyocr.Reader(['ru'])
         texts = []
-
+        n = CarNumber()
         for i in self.coords:
             cropped_image = img[i[1]:i[3], i[0]:i[2]]
             gray = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
-            text = reader.readtext(gray, detail=0)
+            text = reader.readtext(cropped_image, detail=0)
             text = (max(text, key=len))
             text = re.sub(r"\d+$", "", text)
+            print(text)
+            n.main(text)
             texts.append(text)
+        n.get_car_numbers()
         return texts
