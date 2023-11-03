@@ -1,41 +1,62 @@
-import sys
-
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import *
+import sqlite3
+import time
 
 
-class SecondWindow(QtWidgets.QWidget):
-    def __init__(self,
-                 parent=None):  # если собрался передавать аргументы, то не забудь их принять (nameofargument, self, parent=None)
-        super().__init__(parent, QtCore.Qt.Window)
-        self.build()  # ну и передать в открывающееся окно соответственно (nameofargument, self)
+class CarNumber:
 
-    def build(self):
-        self.setGeometry(300, 300, 300, 300)
-        self.setWindowTitle('NoTittle')
+    def create_table(self):
+        con = sqlite3.connect('LicensePlates.db')
+        with con:
+            cursor = con.cursor()
+            cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS car_numbers(
+                            id INTEGER PRIMARY KEY,
+                            number TEXT NOT NULL,
+                            date TEXT NOT NULL
+                        )
+                    ''')
 
+    def add_car_number(self, number):
+        conn = sqlite3.connect('LicensePlates.db')
+        with conn:
+            data = conn.execute("select count(*) from sqlite_master where type='table' and name='goods'")
+            for row in data:
+                if row[0] == 0:
+                    self.create_table()
+                    with conn:
+                        cursor = conn.cursor()
+                        cursor.execute('''
+                                INSERT INTO car_numbers(number) VALUES(?)
+                            ''', (number,))
+                        conn.commit()
+                else:
+                    with conn:
+                        cursor = conn.cursor()
+                        cursor.execute('''
+                                INSERT INTO car_numbers(number) VALUES(?)
+                            ''', (number,))
+                        conn.commit()
 
-class Example(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
+    def add_time(self, timee):
+        conn = sqlite3.connect('LicensePlates.db')
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                    INSERT INTO car_numbers(date) VALUES(?)
+                ''', (timee,))
+            conn.commit()
 
-    def initUI(self):
-        self.setGeometry(300, 300, 300, 300)
-        self.setWindowTitle('NoTittle')
+    def get_car_numbers(self):
+        with sqlite3.connect('LicensePlates.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                    SELECT * FROM car_numbers
+                ''')
+            rows = cursor.fetchall()
+            return rows
 
-        self.btn = QPushButton('Butn', self)
-        self.btn.resize(100, 100)
-        self.btn.move(100, 100)
-        self.btn.clicked.connect(self.openWin)
-
-    def openWin(self):
-        self.secondWin = SecondWindow(self)
-        self.secondWin.show()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Example()
-    ex.show()
-    sys.exit(app.exec())
+    def main(self, number, ):
+        car_number = CarNumber()
+        self.add_car_number(number)
+        timee = time.strftime("%d/%m/%Y, %H:%M:%S", time.localtime())
+        self.add_time(timee)

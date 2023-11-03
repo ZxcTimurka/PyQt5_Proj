@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 
 class CarNumber:
@@ -10,11 +11,12 @@ class CarNumber:
             cursor.execute('''
                         CREATE TABLE IF NOT EXISTS car_numbers(
                             id INTEGER PRIMARY KEY,
-                            number TEXT NOT NULL
+                            number TEXT,
+                            date TEXT
                         )
                     ''')
 
-    def add_car_number(self, number):
+    def add_car_number(self, number, timee):
         conn = sqlite3.connect('LicensePlates.db')
         with conn:
             # получаем количество таблиц с нужным нам именем
@@ -26,15 +28,15 @@ class CarNumber:
                     with conn:
                         cursor = conn.cursor()
                         cursor.execute('''
-                                INSERT INTO car_numbers(number) VALUES(?)
-                            ''', (number,))
+                                INSERT INTO car_numbers(number, date) VALUES(?, ?)
+                            ''', (number, timee))
                         conn.commit()
                 else:
                     with conn:
                         cursor = conn.cursor()
                         cursor.execute('''
-                                INSERT INTO car_numbers(number) VALUES(?)
-                            ''', (number,))
+                                INSERT INTO car_numbers(number, date) VALUES(?, ?)
+                            ''', (number, timee))
                         conn.commit()
 
     def get_car_numbers(self):
@@ -48,4 +50,5 @@ class CarNumber:
 
     def main(self, number):
         car_number = CarNumber()
-        self.add_car_number(number)
+        timee = time.strftime("%d/%m/%Y, %H:%M:%S", time.localtime())
+        self.add_car_number(number, timee)

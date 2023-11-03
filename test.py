@@ -20,14 +20,15 @@ class SecondWindow(QtWidgets.QWidget):
         cur = con.cursor()
         self.setGeometry(300, 300, 300, 300)
         self.setWindowTitle('База данных')
-        self.dbp = QVBoxLayout()
-        self.dbl = QLabel(self)
+        # self.bdp = QVBoxLayout()
+        # self.bdl = QLabel(self)
 
         res = cur.execute('SELECT * FROM car_numbers').fetchall()
-        for elem in range(10):
-            self.dbl.setText(elem)
-            self.dbl.show()
-        self.dbp.addWidget(self.dbl)
+        for elem in res:
+            print(*elem)
+            # self.bdl.setText('\n'.join(elem))
+            # self.bdp.addWidget(self.bdl)
+        # self.bdl.show()
         con.close()
 
 
@@ -83,7 +84,6 @@ class Detector(QWidget):
                 self.layout1.addWidget(label1)
                 self.layout1.addWidget(self.label2)
 
-                os.remove(f'{j}.png')
             self.setLayout(self.layout1)
             self.layout1.addStretch()
 
