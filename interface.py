@@ -15,10 +15,10 @@ class Detector(QWidget):
 
     def initUI(self):
         self.setGeometry(0, 0, 600, 600)
+        self.setWindowTitle('Детектор номеров')
 
         self.btn = QPushButton('Выбрать фото', self)
         self.btn.clicked.connect(self.load_image)
-        self.setWindowTitle('Детектор номеров')
         self.label1 = QLabel('Изображение:', self)
         self.label1.move(10, 30)
         self.label1.show()
