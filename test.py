@@ -1,11 +1,10 @@
-import os
 import sqlite3
 import sys
 import threading
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QFileDialog, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QFileDialog, QLabel, QVBoxLayout, QLineEdit
 
 from ai import LicensePlateDetector
 
@@ -18,18 +17,46 @@ class SecondWindow(QtWidgets.QWidget):
     def build(self):
         con = sqlite3.connect('LicensePlates.db')
         cur = con.cursor()
-        self.setGeometry(300, 300, 300, 300)
+        self.setGeometry(300, 300, 400, 300)
         self.setWindowTitle('База данных')
-        # self.bdp = QVBoxLayout()
-        # self.bdl = QLabel(self)
+        self.bdt = QLineEdit(self)
+        self.bdt.resize(40, 20)
+        self.bdt.move(350, 250)
+        self.bdbtn = QPushButton('Вывести', self)
+        self.bdbtn.clicked.connect(self.print_im)
+        self.bdbtn.resize(55, 20)
+        self.bdbtn.move(340, 220)
+        self.bdp = QVBoxLayout()
+        self.bdl = QLabel(self)
+        elems = []
+        try:
+            res = cur.execute('SELECT * FROM car_numbers').fetchall()
+            for elem in res:
+                elems.append(str(elem[:-1])[1:-1])
+                self.bdl.setText('\n'.join(elems))
+                self.bdl.show()
+                self.bdp.addWidget(self.bdl)
+            self.setLayout(self.bdp)
+            con.close()
+        except Exception as e:
+            print(e)
 
-        res = cur.execute('SELECT * FROM car_numbers').fetchall()
-        for elem in res:
-            print(*elem)
-            # self.bdl.setText('\n'.join(elem))
-            # self.bdp.addWidget(self.bdl)
-        # self.bdl.show()
-        con.close()
+    def print_im(self):
+        try:
+            con = sqlite3.connect('LicensePlates.db')
+            cur = con.cursor()
+            res = cur.execute(f'SELECT * FROM car_numbers WHERE id = "{self.bdt.text()}";').fetchall()
+            for elem in res:
+                path = (str(elem[3:])[2:-3])
+            con.close()
+            self.label = QLabel(self)
+            pixmap = QPixmap(path)
+            self.label.setPixmap(pixmap)
+            self.label.move(200, 10)
+            self.label.resize(pixmap.width(), pixmap.height())
+            self.label.show()
+        except Exception as e:
+            print(e)
 
 
 class Detector(QWidget):
@@ -76,7 +103,7 @@ class Detector(QWidget):
 
             for j in self.ai.coords:
                 cropped_image = image.crop(j)
-                cropped_image.save(f'{j}.png')
+                # cropped_image.save(f'{j}.png')
 
                 label1 = QLabel()
                 pixmap = QPixmap(f'{j}.png')
